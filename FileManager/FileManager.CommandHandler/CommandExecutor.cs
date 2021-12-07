@@ -4,43 +4,44 @@ namespace FileManager.Command
 {
     internal static class CommandExecutor
     {
-        public static void Execute(Request request)
+        public static void Execute(Command command)
         {
-            switch (request.Command)
+            switch (command.Name)
             {
                 case UserCommand.ChangeCurrentDirectory:
                     {
-                        Directory.SetCurrentDirectory(null);
+                        Directory.SetCurrentDirectory(command.Arguments[0]);
                         break;
                     }
                 case UserCommand.CreateDirectory:
                     {
-                        Directory.CreateDirectory(null);
+                        Directory.CreateDirectory(command.Arguments[0]);
                         break;
                     }
                 case UserCommand.CreateFile:
                     {
-                        File.Create(null);
+                        File.Create(command.Arguments[0]);
                         break;
                     }
                 case UserCommand.WriteToFile:
                     {
-                        File.AppendAllText(null, null);
+                        File.AppendAllText(command.Arguments[0], command.Arguments[1]);
                         break;
                     }
                 case UserCommand.Remove:
                     {
-                        Directory.Delete(null);
+                        Directory.Delete(command.Arguments[0]);
                         break;
                     }
                 case UserCommand.Move:
                     {
-                        Directory.Move(null, null);
+                        Directory.Move(command.Arguments[0], command.Arguments[1]);
                         break;
                     }
                 case UserCommand.Rename:
                     {
-                        // создать новую директорию/файл с новым именем
+                        Directory.Delete(command.Arguments[0]);
+                        Directory.CreateDirectory(command.Arguments[1]);
                         break;
                     }
             }

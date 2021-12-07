@@ -5,15 +5,15 @@ namespace FileManager.Command
 {
     internal static class CommandParser
     {
-        private static readonly Dictionary<string, UserCommand> _commands = new()
+        private static readonly Dictionary<string, Command> _commands = new()
         {
-            { "cd", UserCommand.ChangeCurrentDirectory },
-            { "mkdir", UserCommand.CreateDirectory },
-            { "touch", UserCommand.CreateFile },
-            { "cat", UserCommand.WriteToFile },
-            { "rm", UserCommand.Remove },
-            { "move", UserCommand.Move },
-            { "rename", UserCommand.Rename },
+            { "cd", new ChangeDirectoryCommand() },
+            { "mkdir", new CreateDirectoryCommand() },
+            { "touch", new CreateFileCommand() },
+            { "cat", new WriteToFileCommand() },
+            { "rm", new RemoveCommand() },
+            { "move", new MoveCommand() },
+            { "rename", new RenameCommand() },
         };
 
 
@@ -21,39 +21,44 @@ namespace FileManager.Command
         /// The method searches for commands and context from user request.
         /// </summary>
         /// <returns>Commands and context array</returns>
-        public static (UserCommand, string[]) Parse(string request) => CommandSearch(request);
-
-
-        private static (UserCommand, string[]) CommandSearch(string s)
+        public static Command Parse(string request)
         {
-            if (s == null) 
+            return CommandSearch(request);
+        }
+
+
+        private static Command CommandSearch(string s)
+        {
+            if (s == null || s == string.Empty) 
             { 
-                return (UserCommand.Unknown, null); 
+                return new UnknownCommand(); 
             }
 
-            (UserCommand, string[]) result = (UserCommand.Unknown, null);
+            Command command = new UnknownCommand();
             string[] input = s.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            int keyWordPosition = 0;
+            input[keyWordPosition] = input[keyWordPosition].ToLower();
 
-            if(input.Length > 0)
+            if (_commands.ContainsKey(input[keyWordPosition]))
             {
-                input[0] = input[0].ToLower();
-            }
+                int inputArgsCount = input.Length - 1;
+                command = _commands[input[keyWordPosition]];
 
-            if (_commands.ContainsKey(input[0]))
-            {
-                result.Item1 = _commands[input[0]];
-
-                if (input.Length > 1)
+                if (inputArgsCount == command.ArgsCount)
                 {
-                    result.Item2 = new string[input.Length - 1];
+                    command.Arguments = new string[input.Length - 1];
                     for(int i = 1; i < input.Length; i++)
                     {
-                        result.Item2[i - 1] = input[i];
+                        command.Arguments[i - 1] = input[i];
                     }
+                }
+                else
+                {
+                    return new UnknownCommand();
                 }
             }
 
-            return result;
+            return command; ;
         }
     }
 }

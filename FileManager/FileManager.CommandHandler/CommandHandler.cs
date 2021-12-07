@@ -6,8 +6,17 @@ namespace FileManager.Command
     {
         public static void Run()
         {
-            Request request = new(CommandParser.Parse(Console.ReadLine()));
-            CommandExecutor.Execute(request);
+            Command command = new UnknownCommand();
+            do
+            {
+                Console.Clear();
+                command = CommandParser.Parse(Console.ReadLine());
+                Console.WriteLine(command.Info());
+                Console.ReadKey();
+
+            } while (command.Name == UserCommand.Unknown);
+
+            CommandExecutor.Execute(command);
         }
     }
 }

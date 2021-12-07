@@ -3,7 +3,7 @@ namespace FileManager.Command
 {
     internal enum UserCommand
     {
-        Unknown = -1,
+        Unknown,
         ChangeCurrentDirectory,
         CreateDirectory,
         CreateFile,
