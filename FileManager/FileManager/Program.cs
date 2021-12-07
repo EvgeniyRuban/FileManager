@@ -1,4 +1,5 @@
-﻿using FileManager.CommandHandler;
+﻿using System;
+using FileManager.Command;
 
 namespace FileManager
 {
@@ -6,7 +7,10 @@ namespace FileManager
     {
         static void Main(string[] args)
         {
-            CommandReader.Read();
+            CommandHandler.Run();
+
+            Console.ReadKey();
         }
     }
 }
+

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FileManager.CommandHandler
+namespace FileManager.Command
 {
     internal static class CommandParser
     {

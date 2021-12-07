@@ -1,5 +1,5 @@
 ﻿
-namespace FileManager.CommandHandler
+namespace FileManager.Command
 {
     internal enum UserCommand
     {
