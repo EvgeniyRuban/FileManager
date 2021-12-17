@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 
 namespace FileManager
 {
@@ -6,9 +6,10 @@ namespace FileManager
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-
-            Console.ReadKey();
+            Directory.SetCurrentDirectory(@"C:\Users\zheka\OneDrive\Рабочий стол");
+            FileManager fileManager = new FileManager();
+            fileManager.Run();
         }
     }
 }
+
