@@ -1,6 +1,6 @@
 ﻿
 
-namespace FileManager
+namespace FileManager.Enums
 {
     public enum Location
     {

@@ -1,52 +1,55 @@
 ﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
+using ConsoleCustomizer;
 
 namespace FileManager
 {
-    public abstract class ConsoleWindow
+    internal class ConsoleWindow : ConsoleViewElement
     {
-        protected ConsoleWindow(int width, int height, int x, int y) : this(new Size(width, height), new Point(x,y))
+        public ConsoleWindow(Size size, Point location) : base(size, location)
+        {
+            Content = new();
+        }
+        public ConsoleWindow(int x, int y, int width, int height) : this(new Size(width, height), new Point(x, y))
         {
         }
-        protected ConsoleWindow(Size size, Point position)
+
+        public List<string> Content { get; set; }
+        public int TargetItem { get; private set; }
+
+        public void HighlightNext() => _ = TargetItem != Content.Count - 1 ? TargetItem++ : TargetItem = 0;
+        public void HighlightPrevious() => _ = TargetItem != 0 ? TargetItem-- : TargetItem = Content.Count - 1;
+        public override void Print()
         {
-            Size = size;
-            Position = position;
+            base.Print();
+            PrintContent();
         }
-
-
-        public Size Size { get; set; }
-        public Point Position { get; set; }
-        public ConsoleColor BackgroundColor { get; set; }
-        public ConsoleColor BorderColor { get; set; }
-        public ConsoleColor TextColor { get; set; }
-        public IEnumerable<string> Text { get; set; }
-        public byte TargetStrip { get; set; }
-
-
-        public void Draw()
+        public void ClearContent() => Content.Clear();
+        public void ClearWindow() => CPainter.FillRectangle(Location.X + 1, Location.Y + 1, Size.Width - 1, Size.Height - 1);
+        public void PrintContent()
         {
-            ConsoleGraphics.FillRectangle(Position, Size, Console.BackgroundColor);
-            ConsoleGraphics.FillRectangle(Position, Size, BackgroundColor);
-            ConsoleGraphics.DrawRectangle(Position, Size, BorderColor);
-            PrintText();
+            int textPositionX = Location.X + 1;
+            int textPositionY = Location.Y + 1;
 
-        }
-
-        private void PrintText()
-        {
-            int textPositionX = Position.X + 1;
-            int textPositionY = Position.Y + 1;
-            var temp = Console.BackgroundColor;
-            Console.BackgroundColor = BackgroundColor;
-
-            foreach (var strip in Text)
+            for(int i = 0; i < Content.Count; i++)
             {
                 Console.SetCursorPosition(textPositionX, textPositionY++);
-                Console.Write(strip);
+                if(i == TargetItem)
+                {
+                    SwapBackAndForegroundColors();
+                    Console.Write(Content[i]);
+                    SwapBackAndForegroundColors();
+                    continue;
+                }
+                Console.Write(Content[i]);
             }
-            Console.BackgroundColor = temp;
+        }
+        private void SwapBackAndForegroundColors()
+        {
+            var temp = Console.BackgroundColor;
+            Console.BackgroundColor = Console.ForegroundColor;
+            Console.ForegroundColor = temp;
         }
     }
 }
