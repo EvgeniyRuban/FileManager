@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Drawing;
 
-namespace FileManager
+namespace FileManager.View
 {
-    internal class InfoFrame : ConsoleViewElement
+    internal sealed class InfoFrame : ConsoleViewElement
     {
         public readonly string Content;
 

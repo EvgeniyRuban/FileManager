@@ -1,9 +1,11 @@
 ﻿using System;
+using FileManager.View;
 
 namespace FileManager
 {
     internal static class InputHandler
     {
+        private static FileManager _fileManager = new();
         private static UI _ui = new();
 
         private static void Run()
@@ -17,6 +19,12 @@ namespace FileManager
 
                 switch (input.Key)
                 {
+                    case ConsoleKey.Enter: // Enter folder
+                        {
+                            _ui.ChangeDirectory();
+                            _ui.Update();
+                            break;
+                        }
                     case ConsoleKey.UpArrow:
                         {
                             _ui.HighlightPrevious();
@@ -29,10 +37,6 @@ namespace FileManager
                             _ui.ContentUpdate();
                             break;
                         }
-                    case ConsoleKey.Enter: // Pick
-                        {
-                            break;
-                        }
                     case ConsoleKey.Escape: // Exit
                         {
                             canExit = true;
@@ -42,10 +46,8 @@ namespace FileManager
                         {
                             break;
                         }
-                    case ConsoleKey.F2: // Change
+                    case ConsoleKey.F2:
                         {
-                            _ui.ChangeDirectory();
-                            _ui.Update();
                             break;
                         }
                     case ConsoleKey.F3: // Add

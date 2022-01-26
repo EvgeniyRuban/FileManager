@@ -2,9 +2,9 @@
 using System.IO;
 using System.Collections.Generic;
 
-namespace FileManager
+namespace FileManager.View
 {
-    public class UI
+    internal sealed class UI
     {
         private List<FileSystemInfo> _currentDirectoryContent;
         private ConsoleWindow _fileSystemWindow;
@@ -12,7 +12,7 @@ namespace FileManager
         private readonly InfoFrame[] _infoFrames =
         {
             new (0, Console.WindowHeight - 3, "[F1]: Help"),
-            new (12, Console.WindowHeight - 3, "[F2]: Change folder"),
+            new (12, Console.WindowHeight - 3, "[F2]:"),
             new (33, Console.WindowHeight - 3, "[F3]: Add folder/file"), 
             new (56, Console.WindowHeight - 3, "[F4]: Delete folder/file"),
             new (82, Console.WindowHeight - 3, "[F5]: Refresh"),
@@ -23,26 +23,32 @@ namespace FileManager
         {
             Console.Title = "FileManager";
             Console.CursorVisible = false;
-            CurrentDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            FileManager.SetCurrentDirectory(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+            CurrentDirectory = FileManager.GetCurrentDirectory();
             _fileSystemWindow = new ConsoleWindow(0, 3, Console.WindowWidth - 1, Console.WindowHeight - 7);
-            _currentDirectoryContent = GetCurrentDirectoryContent();
-            _currentDirectoryContent.ForEach(e => _fileSystemWindow.Content.Add(e.Name));
+            _currentDirectoryContent = FileManager.GetCurrentDirectoryContent();
+            _currentDirectoryContent.ForEach(e => _fileSystemWindow.AddContent(e.Name));
+            AddParentDirectoryToList();
             _currentPathFrame = new InfoFrame(0, 0, CurrentDirectory);
-
-            Directory.SetCurrentDirectory(CurrentDirectory);
         }
 
         public string CurrentDirectory { get; private set; }
 
-        public void HighlightNext() => _fileSystemWindow.HighlightNext();
+        public string GetTargetItemPath() => _currentDirectoryContent[_fileSystemWindow.TargetItemIndex].FullName;
+        public void HighlightNext() =>_fileSystemWindow.HighlightNext();
         public void HighlightPrevious() => _fileSystemWindow.HighlightPrevious();
         public void ChangeDirectory()
         {
-            CurrentDirectory = _currentDirectoryContent[_fileSystemWindow.TargetItem].FullName;
-            _currentDirectoryContent = GetCurrentDirectoryContent();
+            if (FileManager.TrySetCurrentDirectory(GetTargetItemPath()) != null)
+            {
+                return;
+            }
+            CurrentDirectory = GetTargetItemPath();
+            _currentDirectoryContent = FileManager.GetCurrentDirectoryContent();
             _currentPathFrame = new(_currentPathFrame.Location.X, _currentPathFrame.Location.Y, CurrentDirectory);
             _fileSystemWindow.ClearContent();
-            _currentDirectoryContent.ForEach(e => _fileSystemWindow.Content.Add(e.Name));
+            _currentDirectoryContent.ForEach(e => _fileSystemWindow.AddContent(e.Name));
+            AddParentDirectoryToList();
         }
         /// <summary>
         /// Print UI elements content only.
@@ -62,14 +68,15 @@ namespace FileManager
             _currentPathFrame.Print();
             Array.ForEach(_infoFrames, e => e.Print());
         }
-        private List<FileSystemInfo> GetCurrentDirectoryContent()
+        private void AddParentDirectoryToList()
         {
-            EnumerationOptions options = new(){ AttributesToSkip = FileAttributes.Hidden };
-            List<string> items = new(Directory.EnumerateFileSystemEntries(CurrentDirectory, "*", options));
-            List<FileSystemInfo> fileSystemInfos = new();
-            items.ForEach(e => fileSystemInfos.Add(new FileInfo(e)));
-
-            return fileSystemInfos;
+            if (FileManager.IsParentExist(CurrentDirectory))
+            {
+                string parentDirectoryDesignation = "...";
+                DirectoryInfo parent = FileManager.GetParentDirectory(CurrentDirectory);
+                _currentDirectoryContent.Insert(0, parent);
+                _fileSystemWindow.Insert(0, parentDirectoryDesignation);
+            }
         }
     }
 }

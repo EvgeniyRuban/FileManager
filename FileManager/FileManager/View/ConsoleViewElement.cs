@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using ConsoleCustomizer;
 
-namespace FileManager
+namespace FileManager.View
 {
     internal abstract class ConsoleViewElement
     {
